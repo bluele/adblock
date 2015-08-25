@@ -259,6 +259,14 @@ func NewRules(ruleStrs []string, opt *RulesOption) (*Rules, error) {
 	return rls, nil
 }
 
+func NewRulesFromFile(path string, opt *RulesOption) (*Rules, error) {
+	lines, err := readLines(path)
+	if err != nil {
+		return nil, err
+	}
+	return NewRules(lines, opt)
+}
+
 func (rules *Rules) ShouldBlock(u string, options map[string]interface{}) bool {
 	if rules.IsWhiteListed(u, options) {
 		return false

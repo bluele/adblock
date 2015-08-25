@@ -1,8 +1,10 @@
 package adblock
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/bluele/adblock/regexp"
+	"os"
 	re "regexp"
 	"strings"
 )
@@ -197,4 +199,24 @@ func AnyTrueValue(mp map[string]bool) bool {
 		}
 	}
 	return false
+}
+
+func readLines(path string) ([]string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	reader := bufio.NewReader(f)
+	lines := []string{}
+	for line := []byte{}; err == nil; line, _, err = reader.ReadLine() {
+		sl := strings.TrimRight(string(line), "\n\r")
+		if len(sl) == 0 {
+			continue
+		}
+		lines = append(lines, sl)
+	}
+
+	return lines, nil
 }
