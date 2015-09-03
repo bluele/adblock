@@ -104,10 +104,6 @@ func NewRule(text string) (*Rule, error) {
 	return rule, nil
 }
 
-func (rule *Rule) RegexString() string {
-	return rule.regexString
-}
-
 func (rule *Rule) MatchingSupported(options map[string]interface{}) bool {
 	if rule.isComment {
 		return false
@@ -191,6 +187,34 @@ func (rule *Rule) domainMatches(domain string) bool {
 		}
 	}
 	return true
+}
+
+func (rule *Rule) Text() string {
+	return rule.text
+}
+
+func (rule *Rule) Raw() string {
+	return rule.raw
+}
+
+func (rule *Rule) RegexString() string {
+	return rule.regexString
+}
+
+func (rule *Rule) Regex() *regexp.Regexp {
+	return rule.regex
+}
+
+func (rule *Rule) IsComment() bool {
+	return rule.isComment
+}
+
+func (rule *Rule) IsException() bool {
+	return rule.isException
+}
+
+func (rule *Rule) IsHTMLRule() bool {
+	return rule.isHTMLRule
 }
 
 type Rules struct {
@@ -314,4 +338,12 @@ func (rules *Rules) matches(u string, options map[string]interface{}, generalRe 
 	}
 
 	return false
+}
+
+func (rules *Rules) BlackList() []*Rule {
+	return rules.blacklist
+}
+
+func (rules *Rules) WhiteList() []*Rule {
+	return rules.whitelist
 }
