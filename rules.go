@@ -104,7 +104,7 @@ func NewRule(text string) (*Rule, error) {
 	return rule, nil
 }
 
-func (rule *Rule) MatchingSupported(options map[string]interface{}) bool {
+func (rule *Rule) MatchingSupported(options map[string]interface{}, reverse bool) bool {
 	if rule.isComment {
 		return false
 	}
@@ -115,7 +115,7 @@ func (rule *Rule) MatchingSupported(options map[string]interface{}) bool {
 		options = map[string]interface{}{}
 	}
 	keys := mapKeys(options)
-	if !isSuperSet(rule.OptionsKeys(), keys) {
+	if !isSuperSet(rule.OptionsKeys(), keys, reverse) {
 		return false
 	}
 
@@ -256,7 +256,7 @@ func NewRules(ruleStrs []string, opt *RulesOption) (*Rules, error) {
 		if err != nil {
 			return nil, err
 		}
-		if rule.regexString != "" && rule.MatchingSupported(params) {
+		if rule.regexString != "" && rule.MatchingSupported(params, false) {
 			rls.rules = append(rls.rules, rule)
 		}
 	}
@@ -329,7 +329,7 @@ func (rules *Rules) matches(u string, options map[string]interface{}, generalRe 
 
 	if !rules.opt.CheckUnsupportedRules {
 		for _, rule := range rls {
-			if rule.MatchingSupported(options) {
+			if rule.MatchingSupported(options, true) {
 				if rule.MatchURL(u, options) {
 					return true
 				}
