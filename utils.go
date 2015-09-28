@@ -70,7 +70,14 @@ func parseDomainOption(text string) map[string]bool {
 // Convert AdBlock rule to a regular expression.
 func ruleToRegexp(text string) (string, error) {
 	if text == "" {
-		return "", InvalidRule
+		return ".*", nil
+	}
+
+	// already regexp?
+	length := len(text)
+	if length >= 2 && text[:1] == "/" && text[length-1:] == "/" {
+		// filter is a regular expression
+		return text[1 : length-1], nil
 	}
 
 	rule := escapeSpecialRegxp.ReplaceAllStringFunc(text, func(src string) string {
@@ -79,7 +86,7 @@ func ruleToRegexp(text string) (string, error) {
 	rule = strings.Replace(rule, "^", `(?:[^\\w\\d_\\\-.%]|$)`, -1)
 	rule = strings.Replace(rule, "*", ".*", -1)
 
-	length := len(rule)
+	length = len(rule)
 	if rule[length-1] == '|' {
 		rule = rule[:length-1] + "$"
 	}
@@ -146,10 +153,22 @@ func mapKeys(m map[string]interface{}) []string {
 	return keys
 }
 
-func isSuperSet(a, b []string) bool {
-	mb := sliceToMap(b)
-	for _, key := range a {
-		_, ok := mb[key]
+func isSuperSet(a, b []string, reverse bool) bool {
+	var (
+		mr map[string]interface{}
+		sr []string
+	)
+
+	if !reverse {
+		mr = sliceToMap(b)
+		sr = a
+	} else {
+		mr = sliceToMap(a)
+		sr = b
+	}
+
+	for _, key := range sr {
+		_, ok := mr[key]
 		if !ok {
 			return false
 		}
